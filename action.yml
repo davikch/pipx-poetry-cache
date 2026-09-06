@@ -28,17 +28,26 @@ runs:
 
     - if: ${{ steps.find-pipx.outcome == 'success' }}
       id: use-cache
+      run: |
+        echo "find-pipx successfull, executing cache action"
+      shell: bash
+
       uses: actions/cache@v6
       with:
         path: "${{ steps.find-pipx.outputs.pipx-path }}/poetry"
         key: ${{ runner.os }}-poetry-${{ inputs.poetry-version }}
 
     - if: ${{ steps.find-pipx.outcome == 'failure' || steps.use-cache.outputs.cache-hit != 'true' }}
-      run: "pipx install poetry==${POETRY_VERSION}"
+
+      run: |
+        echo "pipx not found or cache miss, installing poetry"
+      shell: bash
+
+      run: "pipx install poetry==${{ inputs.poetry-version }}"
       shell: bash
     - uses: actions/setup-python@v7
       with:
-        python-version: ${{env.PYTHON_VERSION}}
+        python-version: ${{ inputs.python-version }}
         cache: "poetry"
     -  run: poetry install
        shell: bash
