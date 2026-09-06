@@ -28,7 +28,7 @@ runs:
 
     - if: ${{ steps.find-pipx.outcome == 'success' }}
       run: |
-        echo "find-pipx successfull, executing cache action"
+        echo "path is ${{ steps.find-pipx.outputs.pipx-path }}"
       shell: bash
 
     - if: ${{ steps.find-pipx.outcome == 'success' }}
@@ -41,7 +41,6 @@ runs:
     - if: ${{ steps.find-pipx.outcome == 'failure' || steps.use-cache.outputs.cache-hit != 'true' }}
 
       run: |
-        echo "pipx not found or cache miss, installing poetry"
         pipx install poetry==${{ inputs.poetry-version }}
       shell: bash
     - uses: actions/setup-python@v7
