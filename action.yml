@@ -50,9 +50,9 @@ runs:
       run: |
         pipx install poetry==${{ inputs.poetry-version }}
       shell: bash
-    - uses: actions/setup-python@v7
-      with:
-        python-version: ${{ inputs.python-version }}
+    # - uses: actions/setup-python@v7
+    #   with:
+    #     python-version: ${{ inputs.python-version }}
         # cache: "poetry"
     -  run: poetry install
        shell: bash
