@@ -28,14 +28,14 @@ runs:
         echo "pipx-venv=$PIPX_VENV" >> "$GITHUB_OUTPUT"
         echo "pipx-bins-path=$PIPX_BIN" >> "$GITHUB_OUTPUT"
 
-    - if: ${{ steps.find-pipx.outcome == 'success' }}
+    - if: steps.find-pipx.outcome == 'success'
       id: use-bin-cache
       uses: actions/cache@v6
       with:
         path: "${{ steps.find-pipx.outputs.pipx-bins-path }}/poetry"
         key: ${{ runner.os }}-poetry-${{ inputs.poetry-version }}
 
-    - if: ${{ steps.find-pipx.outcome == 'success' }}
+    - if: steps.find-pipx.outcome == 'success'
       id: use-venv-cache
       uses: actions/cache@v6
       with:
@@ -43,9 +43,9 @@ runs:
         key: ${{ runner.os }}-poetry-${{ inputs.poetry-version }}
 
     - if: >
-      ${{ steps.find-pipx.outcome == 'failure' || 
-    steps.use-bin-cache.outputs.cache-hit != 'true' || 
-    steps.use-venv-cache.outputs.cache-hit != 'true' }}
+        steps.find-pipx.outcome == 'failure' || 
+        steps.use-bin-cache.outputs.cache-hit != 'true' || 
+        steps.use-venv-cache.outputs.cache-hit != 'true'
 
       run: |
         pipx install poetry==${{ inputs.poetry-version }}
