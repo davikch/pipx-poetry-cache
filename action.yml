@@ -48,8 +48,10 @@ runs:
         steps.use-venv-cache.outputs.cache-hit != 'true'
 
       run: |
-        pipx install poetry==${{ inputs.poetry-version }}
+        pipx install poetry==${INPUTS_POETRY_VERSION}
       shell: bash
+      env:
+        INPUTS_POETRY_VERSION: ${{ inputs.poetry-version }}
     - uses: actions/setup-python@v7
       with:
         python-version: ${{ inputs.python-version }}
@@ -57,5 +59,7 @@ runs:
     -  run: poetry install
        shell: bash
     -  if: inputs.command != ''
-       run: poetry run ${{ inputs.command }}
+       run: poetry run ${INPUTS_COMMAND}
        shell: bash
+       env:
+         INPUTS_COMMAND: ${{ inputs.command }}
