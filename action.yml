@@ -8,7 +8,7 @@ inputs:
     required: true
   command:
     description: Command to run with 'poetry run'
-    required: true
+    required: false
 
 runs:
   using: composite
@@ -49,5 +49,6 @@ runs:
         cache: "poetry"
     -  run: poetry install
        shell: bash
-    -  run: poetry run ${{ inputs.command }}
+    -  if: inputs.command != ''
+       run: poetry run ${{ inputs.command }}
        shell: bash
