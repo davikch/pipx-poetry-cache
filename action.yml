@@ -13,9 +13,6 @@ input:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v7.0.1
-      with:
-        persist-credentials: false
     - id: find-pipx
       name: Get pipx installation path
       shell: bash
