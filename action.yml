@@ -1,7 +1,7 @@
 name: Setup Poetry with pipx or use the cached version
 runs-on: ubuntu-slim
 
-input:
+inputs:
   python-version:
     required: true
   poetry-version:
@@ -35,9 +35,12 @@ runs:
 
     - if: ${{ steps.find-pipx.outcome == 'failure' || steps.use-cache.outputs.cache-hit != 'true' }}
       run: "pipx install poetry==${POETRY_VERSION}"
+      shell: bash
     - uses: actions/setup-python@v7
       with:
         python-version: ${{env.PYTHON_VERSION}}
         cache: "poetry"
     -  run: poetry install
-    -  run: poetry run ${{ input.command }}
+       shell: bash
+    -  run: poetry run ${{ inputs.command }}
+       shell: bash
