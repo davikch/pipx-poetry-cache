@@ -19,26 +19,32 @@ runs:
       continue-on-error: true
       run: |
         PIPX_VENV="$(pipx environment --value PIPX_LOCAL_VENVS)"
+        PIPX_BIN="$(pipx environment --value PIPX_BIN_DIR)"
 
-        if [ -z "$PIPX_VENV" ]; then
+        if [ -z "$PIPX_VENV" || -z "$PIPX_BIN" ]; then
           exit 1
         fi
 
-        echo "pipx-path=$PIPX_VENV" >> "$GITHUB_OUTPUT"
+        echo "pipx-venv=$PIPX_VENV" >> "$GITHUB_OUTPUT"
+        echo "pipx-bins-path=$PIPX_BIN" >> "$GITHUB_OUTPUT"
 
     - if: ${{ steps.find-pipx.outcome == 'success' }}
-      run: |
-        echo "path is ${{ steps.find-pipx.outputs.pipx-path }}"
-      shell: bash
-
-    - if: ${{ steps.find-pipx.outcome == 'success' }}
-      id: use-cache
+      id: use-bin-cache
       uses: actions/cache@v6
       with:
-        path: "${{ steps.find-pipx.outputs.pipx-path }}/poetry"
+        path: "${{ steps.find-pipx.outputs.pipx-bins-path }}/poetry"
         key: ${{ runner.os }}-poetry-${{ inputs.poetry-version }}
 
-    - if: ${{ steps.find-pipx.outcome == 'failure' || steps.use-cache.outputs.cache-hit != 'true' }}
+    - if: ${{ steps.find-pipx.outcome == 'success' }}
+      id: use-venv-cache
+      uses: actions/cache@v6
+      with:
+        path: "${{ steps.find-pipx.outputs.pipx-venv }}/poetry"
+        key: ${{ runner.os }}-poetry-${{ inputs.poetry-version }}
+
+    - if: ${{ steps.find-pipx.outcome == 'failure' 
+    || steps.use-bin-cache.outputs.cache-hit != 'true'
+    || steps.use-venv-cache.outputs.cache-hit != 'true' }}
 
       run: |
         pipx install poetry==${{ inputs.poetry-version }}
