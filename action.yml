@@ -40,7 +40,7 @@ runs:
       uses: actions/cache@v6
       with:
         path: "${{ steps.find-pipx.outputs.pipx-venv }}/poetry"
-        key: ${{ runner.os }}-poetry-${{ inputs.poetry-version }}
+        key: ${{ runner.os }}-poetry-venv-${{ inputs.poetry-version }}
 
     - if: >
         steps.find-pipx.outcome == 'failure' || 
