@@ -18,7 +18,7 @@ runs:
       shell: bash
       continue-on-error: true
       run: |
-        PIPX_VENV="$(pipx environment --value PIPX_LOCAL_VENVS)/poetry"
+        PIPX_VENV="$(pipx environment --value PIPX_LOCAL_VENVS)"
 
         if [ -z "$PIPX_VENV" ]; then
           exit 1
