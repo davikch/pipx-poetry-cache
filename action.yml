@@ -1,47 +1,46 @@
-jobs:
+name: Setup Poetry with pipx or use the cached version
+runs-on: ubuntu-slim
 
-  use-poetry:
-    name: Setup Poetry with pipx or use the cached version
-    runs-on: ubuntu-slim
+input:
+  python-version:
+    required: true
+  poetry-version:
+    required: true
+  command:
+    description: Command to run with 'poetry run'
+    required: true
 
-    input:
-      python-version:
-        required: true
-      poetry-version:
-        required: true
-      command:
-        description: Command to run with 'poetry run'
-        required: true
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v7.0.1
+      with:
+        persist-credentials: false
+    - id: find-pipx
+      name: Get pipx installation path
+      shell: bash
+      continue-on-error: true
+      run: |
+        PIPX_VENV="$(pipx environment --value PIPX_LOCAL_VENVS)/poetry"
 
-    steps:
-      - uses: actions/checkout@v7.0.1
-        with:
-          persist-credentials: false
-      - id: find-pipx
-        name: Get pipx installation path
-        shell: bash
-        continue-on-error: true
-        run: |
-          PIPX_VENV="$(pipx environment --value PIPX_LOCAL_VENVS)/poetry"
+        if [ -z "$PIPX_VENV" ]; then
+          exit 1
+        fi
 
-          if [ -z "$PIPX_VENV" ]; then
-            exit 1
-          fi
+        echo "pipx-path=$PIPX_VENV" >> "$GITHUB_OUTPUT"
 
-          echo "pipx-path=$PIPX_VENV" >> "$GITHUB_OUTPUT"
+    - if: ${{ steps.find-pipx.outcome == 'success' }}
+      id: use-cache
+      uses: actions/cache@v6
+      with:
+        path: "${{ steps.find-pipx.outputs.pipx-path }}/poetry"
+        key: ${{ runner.os }}-poetry-${{ inputs.poetry-version }}
 
-      - if: ${{ steps.find-pipx.outcome == 'success' }}
-        id: use-cache
-        uses: actions/cache@v6
-        with:
-          path: "${{ steps.find-pipx.outputs.pipx-path }}/poetry"
-          key: ${{ runner.os }}-poetry-${{ inputs.poetry-version }}
-
-      - if: ${{ steps.find-pipx.outcome == 'failure' || steps.use-cache.outputs.cache-hit != 'true' }}
-        run: "pipx install poetry==${POETRY_VERSION}"
-      - uses: actions/setup-python@v7
-        with:
-          python-version: ${{env.PYTHON_VERSION}}
-          cache: "poetry"
-      -  run: poetry install
-      -  run: poetry run ${{ input.command }}
+    - if: ${{ steps.find-pipx.outcome == 'failure' || steps.use-cache.outputs.cache-hit != 'true' }}
+      run: "pipx install poetry==${POETRY_VERSION}"
+    - uses: actions/setup-python@v7
+      with:
+        python-version: ${{env.PYTHON_VERSION}}
+        cache: "poetry"
+    -  run: poetry install
+    -  run: poetry run ${{ input.command }}
