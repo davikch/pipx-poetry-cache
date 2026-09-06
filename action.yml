@@ -27,11 +27,12 @@ runs:
         echo "pipx-path=$PIPX_VENV" >> "$GITHUB_OUTPUT"
 
     - if: ${{ steps.find-pipx.outcome == 'success' }}
-      id: use-cache
       run: |
         echo "find-pipx successfull, executing cache action"
       shell: bash
 
+    - if: ${{ steps.find-pipx.outcome == 'success' }}
+      id: use-cache
       uses: actions/cache@v6
       with:
         path: "${{ steps.find-pipx.outputs.pipx-path }}/poetry"
@@ -41,9 +42,7 @@ runs:
 
       run: |
         echo "pipx not found or cache miss, installing poetry"
-      shell: bash
-
-      run: "pipx install poetry==${{ inputs.poetry-version }}"
+        pipx install poetry==${{ inputs.poetry-version }}
       shell: bash
     - uses: actions/setup-python@v7
       with:
