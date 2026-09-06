@@ -1,5 +1,5 @@
 name: Setup Poetry with pipx or use the cached version
-runs-on: ubuntu-slim
+runs-on: ubuntu-24.04
 
 inputs:
   python-version:
