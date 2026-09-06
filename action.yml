@@ -42,9 +42,10 @@ runs:
         path: "${{ steps.find-pipx.outputs.pipx-venv }}/poetry"
         key: ${{ runner.os }}-poetry-${{ inputs.poetry-version }}
 
-    - if: ${{ steps.find-pipx.outcome == 'failure' |
-    || steps.use-bin-cache.outputs.cache-hit != 'true' |
-    || steps.use-venv-cache.outputs.cache-hit != 'true' }}
+    - if: >
+      ${{ steps.find-pipx.outcome == 'failure' || 
+    steps.use-bin-cache.outputs.cache-hit != 'true' || 
+    steps.use-venv-cache.outputs.cache-hit != 'true' }}
 
       run: |
         pipx install poetry==${{ inputs.poetry-version }}
